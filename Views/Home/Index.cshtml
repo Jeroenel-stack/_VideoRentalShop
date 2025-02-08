@@ -1,0 +1,59 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="container text-center mt-5">
+    <div class="p-5 rounded shadow-lg border border-light animate__animated animate__fadeIn">
+        <h1 class="display-3 text-primary fw-bold">🎬 Video Shop Rental 🎥</h1>
+        <p class="lead">Your one-stop destination for renting your favorite movies.</p>
+        <hr class="my-4">
+        <p class="fst-italic">Explore our collection and start renting now!</p>
+
+        @if (User.Identity.IsAuthenticated)
+        {
+            <div class="mt-4">
+                <a class="btn btn-primary btn-lg mx-2 animate__animated animate__zoomIn" asp-controller="Movies" asp-action="Index">
+                    🎥 Browse Movies
+                </a>
+                <a class="btn btn-success btn-lg mx-2 animate__animated animate__zoomIn" asp-controller="Customers" asp-action="Index">
+                    🧑 View Customers
+                </a>
+            </div>
+        }
+        else
+        {
+            <div class="mt-4 animate__animated animate__fadeInUp">
+                <p class="text-danger fw-bold">Please log in to browse movies and manage customers.</p>
+                <a class="btn btn-warning btn-lg" asp-area="Identity" asp-page="/Account/Login">🔑 Log In</a>
+                <a class="btn btn-primary btn-lg mx-2" asp-area="Identity" asp-page="/Account/Register">📝 Register</a>
+            </div>
+
+        }
+    </div>
+
+    <div class="mt-4">
+        <p class="fade-in">
+            Want to build your own web apps? Learn more at
+            <a href="https://learn.microsoft.com/aspnet/core" target="_blank" class="text-decoration-none fw-bold text-info">
+                ASP.NET Core Documentation
+            </a>.
+        </p>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Fade-in effect for elements on page load
+        document.addEventListener("DOMContentLoaded", function () {
+            const fadeElements = document.querySelectorAll(".fade-in");
+            fadeElements.forEach(el => {
+                el.style.opacity = 0;
+                el.style.transition = "opacity 1.5s ease-in-out";
+                setTimeout(() => el.style.opacity = 1, 500);
+            });
+        });
+    </script>
+}
+
+<!-- Include Animate.css for animations -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
