@@ -5,16 +5,14 @@ namespace _VideoRentalShop.Models
 {
     public class RentalDetail
     {
-        [Key]
-        public int Id { get; set; }
-        [ForeignKey("RentalHeaderId")]
-        public int RentalHeaderId { get; set; }
-        public RentalHeader? RentalHeader { get; set; }
+        public int RentalDetailId { get; set; }
+        public int RentalHeaderId { get; set; }  
         public int MovieId { get; set; }
-        [ForeignKey("MovieId")]
         public DateTime DueDate { get; set; }
-        public Movie? Movie { get; set; }
+        public int Quantity { get; set; }
+        public string? Status { get; set; } 
 
-        public bool IsReturned { get; set; } = false;
+        public RentalHeader? RentalHeader { get; set; }
+        public Movie? Movie { get; set; }
     }
 }

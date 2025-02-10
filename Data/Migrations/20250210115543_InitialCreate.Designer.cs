@@ -12,7 +12,7 @@ using _VideoRentalShop.Data;
 namespace _VideoRentalShop.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250208144723_InitialCreate")]
+    [Migration("20250210115543_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -229,123 +229,162 @@ namespace _VideoRentalShop.Data.Migrations
 
             modelBuilder.Entity("_VideoRentalShop.Models.Customer", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("CustomerId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CustomerId"));
 
                     b.Property<string>("Address")
-                        .HasColumnType("nvarchar(max)");
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<DateTime>("DateOfBirth")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Email")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)")
+                        .UseCollation("Latin1_General_CI_AS");
+
+                    b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)")
+                        .UseCollation("Latin1_General_CI_AS");
+
+                    b.Property<DateTime>("MembershipDate")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETDATE()");
+
+                    b.Property<string>("MiddleName")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Phone")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<string>("PhoneNumber")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("Sex")
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("Id");
+                    b.HasKey("CustomerId");
 
-                    b.ToTable("Customer", (string)null);
+                    b.HasIndex("Email")
+                        .IsUnique()
+                        .HasFilter("[Email] IS NOT NULL");
+
+                    b.ToTable("Customer");
                 });
 
             modelBuilder.Entity("_VideoRentalShop.Models.Movie", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("MovieId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MovieId"));
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Director")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("Genre")
-                        .HasColumnType("nvarchar(max)");
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<DateTime>("ReleaseDate")
                         .HasColumnType("datetime2");
 
                     b.Property<decimal>("RentalPrice")
                         .HasPrecision(10, 2)
-                        .HasColumnType("decimal(10,2)");
+                        .HasColumnType("decimal(10, 2)");
 
                     b.Property<int>("Stock")
                         .HasColumnType("int");
 
                     b.Property<string>("Title")
-                        .HasColumnType("nvarchar(max)");
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
-                    b.HasKey("Id");
+                    b.HasKey("MovieId");
 
-                    b.ToTable("Movie", (string)null);
+                    b.ToTable("Movie");
                 });
 
             modelBuilder.Entity("_VideoRentalShop.Models.RentalDetail", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("RentalDetailId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RentalDetailId"));
 
                     b.Property<DateTime>("DueDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<bool>("IsReturned")
-                        .HasColumnType("bit");
-
                     b.Property<int>("MovieId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("MovieId1")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Quantity")
                         .HasColumnType("int");
 
                     b.Property<int>("RentalHeaderId")
                         .HasColumnType("int");
 
-                    b.HasKey("Id");
+                    b.Property<string>("Status")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("RentalDetailId");
 
                     b.HasIndex("MovieId");
 
+                    b.HasIndex("MovieId1");
+
                     b.HasIndex("RentalHeaderId");
 
-                    b.ToTable("RentalDetail", (string)null);
+                    b.ToTable("RentalHeaderDetails");
                 });
 
             modelBuilder.Entity("_VideoRentalShop.Models.RentalHeader", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("RentalHeaderId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RentalHeaderId"));
 
                     b.Property<int>("CustomerId")
                         .HasColumnType("int");
 
-                    b.Property<bool>("IsReturned")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("MovieId")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("RentedDate")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETDATE()");
+
+                    b.Property<DateTime?>("ReturnDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime>("ReturnDate")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
+                    b.HasKey("RentalHeaderId");
 
                     b.HasIndex("CustomerId");
 
-                    b.HasIndex("MovieId");
-
-                    b.ToTable("RentalHeader", (string)null);
+                    b.ToTable("RentalHeader");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -402,15 +441,19 @@ namespace _VideoRentalShop.Data.Migrations
             modelBuilder.Entity("_VideoRentalShop.Models.RentalDetail", b =>
                 {
                     b.HasOne("_VideoRentalShop.Models.Movie", "Movie")
-                        .WithMany("RentalDetails")
+                        .WithMany()
                         .HasForeignKey("MovieId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("_VideoRentalShop.Models.Movie", null)
+                        .WithMany("RentalDetails")
+                        .HasForeignKey("MovieId1");
+
                     b.HasOne("_VideoRentalShop.Models.RentalHeader", "RentalHeader")
                         .WithMany("RentalDetails")
                         .HasForeignKey("RentalHeaderId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Movie");
@@ -421,25 +464,17 @@ namespace _VideoRentalShop.Data.Migrations
             modelBuilder.Entity("_VideoRentalShop.Models.RentalHeader", b =>
                 {
                     b.HasOne("_VideoRentalShop.Models.Customer", "Customer")
-                        .WithMany("Rental")
+                        .WithMany("RentalHeaders")
                         .HasForeignKey("CustomerId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("_VideoRentalShop.Models.Movie", "Movie")
-                        .WithMany()
-                        .HasForeignKey("MovieId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Customer");
-
-                    b.Navigation("Movie");
                 });
 
             modelBuilder.Entity("_VideoRentalShop.Models.Customer", b =>
                 {
-                    b.Navigation("Rental");
+                    b.Navigation("RentalHeaders");
                 });
 
             modelBuilder.Entity("_VideoRentalShop.Models.Movie", b =>

@@ -22,7 +22,11 @@ namespace _VideoRentalShop.Controllers
         // GET: RentalHeaders
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.RentalHeader.Include(r => r.Customer).Include(r => r.Movie);
+            var applicationDbContext = _context.RentalHeader
+                .Include(r => r.Customer)
+                .Include(rh => rh.RentalDetails)
+                    .ThenInclude(rd => rd.Movie); ;
+
             return View(await applicationDbContext.ToListAsync());
         }
 
@@ -36,8 +40,9 @@ namespace _VideoRentalShop.Controllers
 
             var rentalHeader = await _context.RentalHeader
                 .Include(r => r.Customer)
-                .Include(r => r.Movie)
-                .FirstOrDefaultAsync(m => m.Id == id);
+                .Include(rh => rh.RentalDetails)
+                    .ThenInclude(rd => rd.Movie)
+                .FirstOrDefaultAsync(m => m.RentalHeaderId == id);
             if (rentalHeader == null)
             {
                 return NotFound();
@@ -49,8 +54,8 @@ namespace _VideoRentalShop.Controllers
         // GET: RentalHeaders/Create
         public IActionResult Create()
         {
-            ViewData["CustomerId"] = new SelectList(_context.Customer, "Id", "Id");
-            ViewData["MovieId"] = new SelectList(_context.Movie, "Id", "Id");
+            ViewData["CustomerId"] = new SelectList(_context.Customer, "CustomerId", "CustomerId");
+            ViewData["Movies"] = new SelectList(_context.Movie, "MovieId", "Title");
             return View();
         }
 
@@ -59,16 +64,30 @@ namespace _VideoRentalShop.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,CustomerId,MovieId,RentedDate,ReturnDate,IsReturned")] RentalHeader rentalHeader)
+        public async Task<IActionResult> Create([Bind("RentalHeaderId,CustomerId,RentedDate,ReturnDate")] RentalHeader rentalHeader, List<int>? MovieIds)
         {
             if (ModelState.IsValid)
             {
                 _context.Add(rentalHeader);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+
+                if (MovieIds != null && MovieIds.Count > 0)
+                {
+                    foreach (var movieId in MovieIds)
+                    {
+                        var rentalDetail = new RentalDetail
+                        {
+                            RentalHeaderId = rentalHeader.RentalHeaderId,
+                            MovieId = movieId,
+                            Status = "Rented"
+                        };
+                        _context.RentalHeaderDetails.Add(rentalDetail);
+                    }
+                    await _context.SaveChangesAsync(); // Save RentalHeaderDetails
+                }
+                    return RedirectToAction(nameof(Index));
             }
-            ViewData["CustomerId"] = new SelectList(_context.Customer, "Id", "Id", rentalHeader.CustomerId);
-            ViewData["MovieId"] = new SelectList(_context.Movie, "Id", "Id", rentalHeader.MovieId);
+            ViewData["CustomerId"] = new SelectList(_context.Customer, "CustomerId", "Address", rentalHeader.CustomerId);
             return View(rentalHeader);
         }
 
@@ -80,13 +99,20 @@ namespace _VideoRentalShop.Controllers
                 return NotFound();
             }
 
-            var rentalHeader = await _context.RentalHeader.FindAsync(id);
+            var rentalHeader = await _context.RentalHeader
+                .Include(r => r.RentalDetails!)
+                .ThenInclude(d => d.Movie!)
+                .FirstOrDefaultAsync(r => r.RentalHeaderId == id);
             if (rentalHeader == null)
             {
                 return NotFound();
             }
-            ViewData["CustomerId"] = new SelectList(_context.Customer, "Id", "Id", rentalHeader.CustomerId);
-            ViewData["MovieId"] = new SelectList(_context.Movie, "Id", "Id", rentalHeader.MovieId);
+            ViewData["CustomerId"] = new SelectList(_context.Customer, "CustomerId", "CustomerId", rentalHeader.CustomerId);
+            var movieList = _context.Movie.ToList();
+            var selectedMovies = rentalHeader.RentalDetails?.Select(d => d.MovieId).ToList() ?? new List<int>();
+
+            ViewData["MovieList"] = new SelectList(movieList, "MovieId", "Title");
+            ViewBag.SelectedMovies = rentalHeader.RentalDetails?.Select(d => new { d.MovieId, d.Movie.Title, d.Status }).ToList();
             return View(rentalHeader);
         }
 
@@ -95,9 +121,9 @@ namespace _VideoRentalShop.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,CustomerId,MovieId,RentedDate,ReturnDate,IsReturned")] RentalHeader rentalHeader)
+        public async Task<IActionResult> Edit(int id, [Bind("RentalHeaderId,CustomerId,RentedDate,ReturnDate")] RentalHeader rentalHeader,  List<int> MovieIds, List<string> Statuses)
         {
-            if (id != rentalHeader.Id)
+            if (id != rentalHeader.RentalHeaderId)
             {
                 return NotFound();
             }
@@ -106,12 +132,41 @@ namespace _VideoRentalShop.Controllers
             {
                 try
                 {
-                    _context.Update(rentalHeader);
+                    var existingRental = await _context.RentalHeader
+                         .Include(r => r.RentalDetails)
+                         .FirstOrDefaultAsync(r => r.RentalHeaderId == id);
+
+                    if (existingRental == null)
+                    {
+                        return NotFound();
+                    }
+
+                    // Update RentalHeader details
+                    existingRental.CustomerId = rentalHeader.CustomerId;
+                    existingRental.RentedDate = rentalHeader.RentedDate;
+                    existingRental.ReturnDate = rentalHeader.ReturnDate;
+
+                    // Remove old movie selections
+                    _context.RentalHeaderDetails.RemoveRange(existingRental.RentalDetails);
+
+                    // Add new movie selections with statuses
+                    if (MovieIds != null && Statuses != null && MovieIds.Count == Statuses.Count)
+                    {
+                        for (int i = 0; i < MovieIds.Count; i++)
+                        {
+                            _context.RentalHeaderDetails.Add(new RentalDetail
+                            {
+                                RentalHeaderId = rentalHeader.RentalHeaderId,
+                                MovieId = MovieIds[i],
+                                Status = Statuses[i]
+                            });
+                        }
+                    }
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!RentalHeaderExists(rentalHeader.Id))
+                    if (!RentalHeaderExists(rentalHeader.RentalHeaderId))
                     {
                         return NotFound();
                     }
@@ -122,8 +177,7 @@ namespace _VideoRentalShop.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["CustomerId"] = new SelectList(_context.Customer, "Id", "Id", rentalHeader.CustomerId);
-            ViewData["MovieId"] = new SelectList(_context.Movie, "Id", "Id", rentalHeader.MovieId);
+            ViewData["CustomerId"] = new SelectList(_context.Customer, "CustomerId", "CustomerId", rentalHeader.CustomerId);
             return View(rentalHeader);
         }
 
@@ -137,8 +191,7 @@ namespace _VideoRentalShop.Controllers
 
             var rentalHeader = await _context.RentalHeader
                 .Include(r => r.Customer)
-                .Include(r => r.Movie)
-                .FirstOrDefaultAsync(m => m.Id == id);
+                .FirstOrDefaultAsync(m => m.RentalHeaderId == id);
             if (rentalHeader == null)
             {
                 return NotFound();
@@ -164,7 +217,7 @@ namespace _VideoRentalShop.Controllers
 
         private bool RentalHeaderExists(int id)
         {
-            return _context.RentalHeader.Any(e => e.Id == id);
+            return _context.RentalHeader.Any(e => e.RentalHeaderId == id);
         }
     }
 }

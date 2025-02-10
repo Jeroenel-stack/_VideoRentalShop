@@ -5,18 +5,22 @@ namespace _VideoRentalShop.Models
 {
     public class Customer
     {
-        [Key]
-        public int Id { get; set; }
-        public string? Name { get; set; }
-        public DateTime DateOfBirth { get; set; }
+        public int CustomerId { get; set; }
+        public string? FirstName { get; set; }
+        public string? MiddleName { get; set; }
+        public string? LastName { get; set; }
         public string? Sex { get; set; }
-        [NotMapped] //  Prevents EF from creating a database column
+        [NotMapped]
         public int Age => DateTime.Now.Year - DateOfBirth.Year;
         public string? Email { get; set; }
+        public string? PhoneNumber { get; set; }
         public string? Address { get; set; }
-        public string? Phone { get; set; }
+        public DateTime DateOfBirth { get; set; }
+        public DateTime MembershipDate { get; set; }
 
-        public ICollection<RentalHeader>? Rental { get; set; } // Navigation Property
+
+
+        public ICollection<RentalHeader>? RentalHeaders { get; set; } // Navigation Property
 
 
     }

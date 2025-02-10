@@ -34,7 +34,7 @@ namespace _VideoRentalShop.Controllers
             }
 
             var movie = await _context.Movie
-                .FirstOrDefaultAsync(m => m.Id == id);
+                .FirstOrDefaultAsync(m => m.MovieId == id);
             if (movie == null)
             {
                 return NotFound();
@@ -54,7 +54,7 @@ namespace _VideoRentalShop.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Title,Genre,Stock,ReleaseDate,RentalPrice")] Movie movie)
+        public async Task<IActionResult> Create([Bind("MovieID,Title,Genre,Stock,ReleaseDate,Director,Description,RentalPrice")] Movie movie)
         {
             if (ModelState.IsValid)
             {
@@ -86,9 +86,9 @@ namespace _VideoRentalShop.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Title,Genre,Stock,ReleaseDate,RentalPrice")] Movie movie)
+        public async Task<IActionResult> Edit(int id, [Bind("MovieID,Title,Genre,Stock,ReleaseDate,Director,Description,RentalPrice")] Movie movie)
         {
-            if (id != movie.Id)
+            if (id != movie.MovieId)
             {
                 return NotFound();
             }
@@ -102,7 +102,7 @@ namespace _VideoRentalShop.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!MovieExists(movie.Id))
+                    if (!MovieExists(movie.MovieId))
                     {
                         return NotFound();
                     }
@@ -125,7 +125,7 @@ namespace _VideoRentalShop.Controllers
             }
 
             var movie = await _context.Movie
-                .FirstOrDefaultAsync(m => m.Id == id);
+                .FirstOrDefaultAsync(m => m.MovieId == id);
             if (movie == null)
             {
                 return NotFound();
@@ -151,7 +151,7 @@ namespace _VideoRentalShop.Controllers
 
         private bool MovieExists(int id)
         {
-            return _context.Movie.Any(e => e.Id == id);
+            return _context.Movie.Any(e => e.MovieId == id);
         }
     }
 }
