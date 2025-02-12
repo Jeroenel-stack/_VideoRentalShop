@@ -12,10 +12,10 @@ namespace _VideoRentalShop.Data
             : base(options)
         {
         }
-        public DbSet<_VideoRentalShop.Models.Customer> Customer { get; set; } = default!;
-        public DbSet<_VideoRentalShop.Models.Movie> Movie { get; set; } = default!;
-        public DbSet<_VideoRentalShop.Models.RentalHeader> RentalHeader { get; set; } = default!;
-        public DbSet<_VideoRentalShop.Models.RentalDetail> RentalHeaderDetails { get; set; } = default!;
+        public DbSet<Customer> Customer { get; set; } 
+        public DbSet<Movie> Movie { get; set; } 
+        public DbSet<RentalHeader> RentalHeader { get; set; } 
+        public DbSet<RentalDetail> RentalHeaderDetails { get; set; } 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
