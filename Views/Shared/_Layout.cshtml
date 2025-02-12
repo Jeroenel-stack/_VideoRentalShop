@@ -86,7 +86,7 @@
                 <a href="@Url.Action("Index", "Home")">🏠 Home</a>
             </li>
 
-            @if (User.Identity.IsAuthenticated)
+            @if (User.Identity!.IsAuthenticated)
             {
                 <li class="nav-item">
                     <a href="@Url.Action("Index", "Customers")">👥 Customers</a>

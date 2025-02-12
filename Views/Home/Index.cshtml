@@ -9,7 +9,7 @@
         <hr class="my-4">
         <p class="fst-italic">Explore our collection and start renting now!</p>
 
-        @if (User.Identity.IsAuthenticated)
+        @if (User.Identity!.IsAuthenticated)
         {
             <div class="mt-4">
                 <a class="btn btn-primary btn-lg mx-2 animate__animated animate__zoomIn" asp-controller="Movies" asp-action="Index">

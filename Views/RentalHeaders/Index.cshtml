@@ -27,12 +27,12 @@
             <tr>
                 <td>@Html.DisplayFor(modelItem => item.RentedDate)</td>
                 <td>@Html.DisplayFor(modelItem => item.ReturnDate)</td>
-                <td>@Html.DisplayFor(modelItem => item.Customer.FirstName) @Html.DisplayFor(modelItem => item.Customer.LastName)</td>
+                <td>@Html.DisplayFor(modelItem => item.Customer!.FirstName) @Html.DisplayFor(modelItem => item.Customer!.LastName)</td>
                 <td>
                     <ul>
                         @foreach (var detail in item.RentalDetails)
                         {
-                            <li>@detail.Movie.Title</li> <!-- Display each movie rented -->
+                            <li>@detail.Movie!.Title</li> <!-- Display each movie rented -->
                         }
                     </ul>
                 </td>

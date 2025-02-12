@@ -25,7 +25,7 @@ namespace _VideoRentalShop.Controllers
             var applicationDbContext = _context.RentalHeader
                 .Include(r => r.Customer)
                 .Include(rh => rh.RentalDetails)
-                    .ThenInclude(rd => rd.Movie); ;
+                    .ThenInclude(rd => rd.Movie); 
 
             return View(await applicationDbContext.ToListAsync());
         }
@@ -112,7 +112,7 @@ namespace _VideoRentalShop.Controllers
             var selectedMovies = rentalHeader.RentalDetails?.Select(d => d.MovieId).ToList() ?? new List<int>();
 
             ViewData["MovieList"] = new SelectList(movieList, "MovieId", "Title");
-            ViewBag.SelectedMovies = rentalHeader.RentalDetails?.Select(d => new { d.MovieId, d.Movie.Title, d.Status }).ToList();
+            ViewBag.SelectedMovies = rentalHeader.RentalDetails?.Select(d => new { d.MovieId, d.Movie!.Title, d.Status }).ToList();
             return View(rentalHeader);
         }
 

@@ -18,8 +18,6 @@ namespace _VideoRentalShop.Models
         public DateTime DateOfBirth { get; set; }
         public DateTime MembershipDate { get; set; }
 
-
-
         public ICollection<RentalHeader>? RentalHeaders { get; set; } // Navigation Property
 
 
