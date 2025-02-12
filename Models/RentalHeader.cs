@@ -10,6 +10,7 @@ namespace _VideoRentalShop.Models
         public DateTime RentedDate { get; set; }
         public DateTime? ReturnDate { get; set; }
         public Customer? Customer { get; set; }
+        public Movie? Movie { get; set; }
         public ICollection<RentalDetail> RentalDetails { get; set; } = new List<RentalDetail>();
     }
 }

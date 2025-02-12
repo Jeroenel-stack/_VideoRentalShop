@@ -34,27 +34,46 @@
     <table class="table">
         <thead>
             <tr>
-                <th>Movie Title</th>
+                <th>Customer Details</th>
+                <th>Movie Details</th>
                 <th>Status</th>
             </tr>
         </thead>
         <tbody>
-            @if (Model.RentalDetails != null && Model.RentalDetails.Any())
-            {
-                @foreach (var detail in Model.RentalDetails)
-                {
-                    <tr>
-                        <td>@detail.Movie!.Title</td>
-                        <td>@detail.Status</td>
-                    </tr>
-                }
-            }
-            else
-            {
-                <tr>
-                    <td colspan="2" class="text-center">No movies rented.</td>
-                </tr>
-            }
+           <tr>
+               <td>
+                   <strong>Id: </strong> @Model.Customer.CustomerId <br />
+                    <strong>FirstName: </strong> @Model.Customer.FirstName <br />
+                    <strong>LastName: </strong> @Model.Customer.LastName <br />
+                    <strong>MiddleName: </strong> @Model.Customer.MiddleName <br />
+                    <strong>PhoneNumber: </strong> @Model.Customer.PhoneNumber <br />
+                    <strong>Email: </strong> @Model.Customer.Email <br />
+                    <strong>Address: </strong> @Model.Customer.Address <br />
+                    <strong>DateOfBirth: </strong> @Model.Customer.DateOfBirth <br />
+                    <strong>MembershipDate: </strong> @Model.Customer.MembershipDate <br />
+                    <strong>Sex: </strong> @Model.Customer.Sex <br />
+                    <strong>Age: </strong> @Model.Customer.Age <br />
+               </td>
+               <td>
+                    <strong>Id: </strong> @Model.Movie?.MovieId <br />
+                    <strong>Title: </strong> @Model.Movie?.Title <br />
+                    <strong>Genre: </strong> @Model.Movie?.Genre <br />
+                    <strong>Director: </strong> @Model.Movie?.Director <br />
+                    <strong>ReleaseDate: </strong> @Model.Movie?.ReleaseDate.ToString("yyyy-MM-dd") <br />
+                    <strong>Stock: </strong> @Model.Movie?.Stock <br />
+                    <strong>RentalPrice: </strong> @Model.Movie?.RentalPrice <br />
+                    <strong>Description: </strong> @Model.Movie?.Description <br />
+               </td>
+                   <td>
+                    <strong>Rented Date: </strong> @Model.RentedDate.ToString("yyyy-MM-dd") 
+                    <strong>Return Date: </strong> @Model.ReturnDate?.ToString("yyyy-MM-dd") 
+                    <strong>Stock: </strong> @Model.Movie?.Stock 
+                    <strong>Rental Status:</strong>
+                    <span class="badge @(Model.ReturnDate != null ? "bg-primary" : "bg-warning")">
+                        @(Model.ReturnDate != null ? "Returned" : "Pending")
+                    </span>
+                </td>
+           </tr>
         </tbody>
     </table>
 </div>
